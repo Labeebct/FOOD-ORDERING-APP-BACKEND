@@ -1,17 +1,25 @@
 const express = require('express');
 const mongoose = require('mongoose')
+const dotenv = require('dotenv').config()
+const cors = require('cors')
 const app = express();
-const port = 8080
 
-const indexRouter = require('./routes/index');
+const port = process.env.PORT
+const user = require('./routes/user');
+const admin = require('./routes/admin')
 
+//Applying inbuilt middleware
+app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static('public'));
 
-app.use('/', indexRouter);
+//Linking router
+app.use('/admin',admin)  
+app.use('/', user);
 
-app.listen(port,() => console.log('Server Is listening'))
-mongoose.connect('mongodb://localhost:27017/RECIPE')
+//Connecting mongodb
+app.listen(port,() => console.log('Server Is listening at',port))
+mongoose.connect('mongodb://localhost:27017/Food_Order')
 .then(() => console.log('Database Connected'))
 .catch((err) => console.log('Databse Connected Failed',err))
