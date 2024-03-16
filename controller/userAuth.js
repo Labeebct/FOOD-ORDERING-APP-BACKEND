@@ -2,9 +2,10 @@ const bcrypt = require('bcrypt')
 const otpGenerator = require('../utils/otpGenarator')
 
 const signupModel = require('../models/signup')
-const emailOtp = require('../utils/emailVerify')
+const {signupEmailOtp , forgetPassEmail} = require('../utils/emailVerify')
 
 let signupOTP;
+let forgetPassOtp;
 
 exports.postSignup = async (req, res) => {
     try {
@@ -46,9 +47,9 @@ exports.postSignup = async (req, res) => {
                 //Checking whether user verified or not
                 if(userExist.verified) return res.status(409).json({msg:'User already Exist',userExist:true})   
                 else{
-                //Sending otp to the users email for verification
-                emailOtp(userName,email,signupOTP)
-                return res.status(401).json({msg:'User is not verified',userVerified:false,email})   
+
+                //Telling the user that this is a unverified account and login to verify email with otp
+                return res.status(401).json({msg:'Account exist with this email Login to Verify',userVerified:false})   
                 }
             } else {
 
@@ -62,7 +63,7 @@ exports.postSignup = async (req, res) => {
             await signupModel.create(req.body)
 
             //Sending otp to user email for verification and passing success msg to frontent after saving user data
-            emailOtp(userName,email,signupOTP)
+            signupEmailOtp(userName,email,signupOTP)
             res.status(200).json({msg: 'Registration success',registered:true,email})
             }
 
@@ -133,7 +134,10 @@ exports.postLogin = async(req,res) => {
         const userExist = await signupModel.findOne({email})
 
         if(userExist){
-            //Checking whether existed user verified or not
+         
+         //Checking whether user active or blocked
+         if(userExist.status == 'active'){
+             //Checking whether existed user verified or not
             if(userExist.verified){
                 //If user verified , checking the password match or not
                 const passwordMatch = await bcrypt.compare(password,userExist.password)
@@ -148,9 +152,12 @@ exports.postLogin = async(req,res) => {
             } else {
                 //If user not verified user will be redirected to otp verification
                 signupOTP = otpGenerator()
-                emailOtp(userExist.userName,email,signupOTP)
+                signupEmailOtp(userExist.userName,email,signupOTP)
                 return res.status(403).json({msg:'Verification is Needed',email})
             }
+         } else {
+            return res.status(503).json({msg:'This account has been Blocked',email})
+        }
         } else {
             //User not exist so passing 404 and passing the message
             return res.status(404).json({msg:'User with email not Exist'})
@@ -164,5 +171,114 @@ exports.postLogin = async(req,res) => {
 }
 
 exports.postForgetpassword = async(req,res) => {
-    
+    try {
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        //Destructuring email to check whether user exist or not
+        const {email} = req.body
+
+        //Checking whether email have values and meet email format
+        if(!email) return res.status(422).json({msg:'Please Enter the email'})
+        else if (!emailRegex.test(email)) return res.status(422).json({msg:'Invalid Email Format'})
+
+        //Checking whether user exist with entered email
+        const userExist = await signupModel.findOne({email})
+
+        if(userExist){
+            forgetPassOtp = otpGenerator()
+            forgetPassEmail(userExist.userName,email,forgetPassOtp)
+            return res.status(200).json({msg:'Redirecting to OTP Verification'})
+        }
+        else return res.status(404).json({msg:'Account doesnt exist with Entered Email'})
+        
+    } catch (error) {
+        console.log('Error in post forget password',error);
+        res.status(500).send('Internal server error')
+    }
 }
+
+exports.postForgetPasswordOtp = async(req,res) => {
+    try {
+
+        //Collecting email to find the user to verify
+        const email = req.params.email
+        
+        //Destructuring otp values from body
+        const {otpValue} = req.body
+    
+        //Validating otp
+        if(otpValue.length == 0 || otpValue.length < 4){
+            return res.status(422).json({msg:'Please provide otp'})
+        }
+
+        //Checking whether user otp matches with created otp
+        if(otpValue != forgetPassOtp){
+            return res.status(409).json({msg:'Invalid OTP'})
+        }
+        else{
+           return res.status(200).json({msg:'Verification Success',email})
+        }
+        
+    } catch (error) {
+        console.log('Error in post otp verification otp');
+        res.status(500).send('Internal server Error')
+    }
+}
+
+exports.postResetPassword = async(req,res) => {
+    try {
+
+        const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+        //Destructuring passwords from body
+        const {oldPassword , newPassword , confirmPassword } = req.body
+
+        //Collecting email to find the user to reset the password
+        const email = req.query.email
+        
+        //Validating Password
+        if(!oldPassword , !newPassword , !confirmPassword){
+            return res.status(422).json({msg:'Please fill all Fields'})
+        } else if (!passwordRegex.test(newPassword)){
+            return res.status(422).json({msg:'Password should be 8+ chars, 1 uppercase, 1 digit, 1 special character'})
+        } else if (newPassword != confirmPassword){
+            return res.status(422).json({msg:'Newpassword and confirm password mismatch'})
+        }
+
+        //Finding user with email
+        const findUser = await signupModel.findOne({email})
+
+        if(findUser){
+            //Taking userold password to compare password
+            const userOldPassword = findUser.password
+
+            //Comparing password
+            const passwordMatch = await bcrypt.compare(oldPassword,userOldPassword)
+            if(passwordMatch){
+               //Salting and Hashing password
+               const salt = await bcrypt.genSalt(10)
+               const newHashedPassword = await bcrypt.hash(newPassword, salt)
+
+               //Checking whether old password and new password are same
+               const samePassword = await bcrypt.compare(newPassword,userOldPassword)
+               if(samePassword){
+                return res.status(409).json({msg:'Old password cannot be the same as the new password'})
+               } else {
+
+                //Upating new password in the database
+                await signupModel.findOneAndUpdate({email},{$set:{password:newHashedPassword}},{new:true})
+                return res.status(200).json({msg:'Password reset Success'})
+               }
+            } else {
+                return res.status(401).json({msg:'Old password is not Correct'})
+            }
+        } else {
+            //Passing 404 when user not exist
+            return res.status(404).json({msg:'No user found with provided email'})
+        }
+        
+    } catch (error) {
+        console.log('Error in post reset password',error);
+    }
+} 

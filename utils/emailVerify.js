@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-async function emailOtp(userName, userMail, otp) {
+async function signupEmailOtp(userName, userMail, otp) {
 
     try {
         await transporter.sendMail({
@@ -55,4 +55,46 @@ async function emailOtp(userName, userMail, otp) {
 }
 
 
-module.exports = emailOtp
+async function forgetPassEmail(userName, userMail, otp) {
+
+    try {
+        await transporter.sendMail({
+            from: 'ctlabeebthaliyil@gmail.com',
+            to: userMail,
+            subject: "Password Reset Confirmation: Your One-Time Passcode (OTP)",
+            html: `
+            <p>
+                Dear ${userName},
+            </p>
+            <p>
+                Your 4 digits OTP for your account password reset is
+            </p>
+            <p style="font-size: 35px; text-align:centre; margin:8px 0; font-weight:500; padding-left:.5rem;">
+                  ${otp}
+            </p>
+            <p>
+                Please safeguard this OTP and avoid sharing it with anyone. It's crucial for completing the password resetting process securely.
+            </p>
+            <p>
+                If you didn't initiate this password reset request or have any concerns, please contact our support team immediately at <a href="mailto:labioocare@gmail.com">labioocare@gmail.com</a>.
+            </p>
+            <p>
+                Thank you for your attention to this matter.
+            </p>
+            <p>
+                Best regards,<br>
+                Labeeb ct<br>
+                LABIO Support Team
+            </p>`
+        });
+
+        console.log(`${otp} otp send to ${userMail}`);
+
+
+    } catch (error) {
+        console.log('Error in nodemailer', error.message);
+    }
+}
+
+
+module.exports = {signupEmailOtp,forgetPassEmail}
