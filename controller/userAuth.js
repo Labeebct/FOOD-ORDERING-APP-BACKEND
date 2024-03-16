@@ -9,7 +9,7 @@ let signupOTP;
 exports.postSignup = async (req, res) => {
     try {
 
-        //Regex to match
+        //Regex to Validate
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
@@ -103,4 +103,66 @@ exports.postOtpverification = async(req,res) => {
         console.log('Error in post otp verification',error);
         res.status(500).send('Internal Server error')
     }
+}
+
+exports.postLogin = async(req,res) => {
+    try {
+
+        //Regex for validating entering datas
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const passwordRegex = /.{8,}/
+
+
+        //Destructuring  login datas
+        const {email , password} = req.body
+
+        //Validating login datas
+        if(!email , !password){
+            return res.status(422).json({msg:'Please Fill all fields'})
+        } else if (!email){
+            return res.status(422).json({msg:'Please Enter the Email'})
+        } else if (!password){
+            return res.status(422).json({msg:'Please Enter the Password'})
+        } else if (!emailRegex.test(email)){
+            return res.status(422).json({msg:'Invalid Email Format'})
+        } else if (!passwordRegex.test(password)){
+            return res.status(422).json({msg:'Password should contains min 8 character'})
+        }
+
+        //Checking whether user exist or not
+        const userExist = await signupModel.findOne({email})
+
+        if(userExist){
+            //Checking whether existed user verified or not
+            if(userExist.verified){
+                //If user verified , checking the password match or not
+                const passwordMatch = await bcrypt.compare(password,userExist.password)
+
+                //Sending succuess msg if passord matches
+                if(passwordMatch){
+                  return res.status(200).json({msg:'Login Success'})
+                } else {
+                  return res.status(401).json({msg:'Incorrect Password'})
+                }
+
+            } else {
+                //If user not verified user will be redirected to otp verification
+                signupOTP = otpGenerator()
+                emailOtp(userExist.userName,email,signupOTP)
+                return res.status(403).json({msg:'Verification is Needed',email})
+            }
+        } else {
+            //User not exist so passing 404 and passing the message
+            return res.status(404).json({msg:'User with email not Exist'})
+        }
+
+        
+    } catch (error) {
+        console.log('Error in post login',error);
+        res.status(500).send('Internal server error')
+    }
+}
+
+exports.postForgetpassword = async(req,res) => {
+    
 }
