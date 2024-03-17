@@ -28,7 +28,7 @@ exports.postSignup = async (req, res) => {
             return res.status(422).json({ msg: 'Invalid email format' })
         }
         else if (!passwordRegex.test(password)) {
-            return res.status(422).json({ msg: 'Please profide a strong password' })
+            return res.status(422).json({ msg: 'Please provide a strong password' })
         }
         else if (password !== confirmPassword) {
             return res.status(422).json({ msg: 'Password mismatch' })
@@ -43,7 +43,7 @@ exports.postSignup = async (req, res) => {
             
 
             if(userExist) {
-
+                
                 //Checking whether user verified or not
                 if(userExist.verified) return res.status(409).json({msg:'User already Exist',userExist:true})   
                 else{
@@ -112,7 +112,6 @@ exports.postLogin = async(req,res) => {
         //Regex for validating entering datas
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const passwordRegex = /.{8,}/
-
 
         //Destructuring  login datas
         const {email , password} = req.body
