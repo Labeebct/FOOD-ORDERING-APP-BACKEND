@@ -40,7 +40,7 @@ async function signupEmailOtp(userName, userMail, otp) {
                 Thank you for your attention to this matter.
             </p>
             <p>
-                Best regards,<br>
+                Best regards,<br> 
                 Labeeb ct<br>
                 LABIO Support Team
             </p>`
