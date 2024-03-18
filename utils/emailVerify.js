@@ -17,7 +17,7 @@ async function signupEmailOtp(userName, userMail, otp) {
 
     try {
         await transporter.sendMail({
-            from: 'ctlabeebthaliyil@gmail.com',
+            from: sendingEmail,
             to: userMail,
             subject: "Account Verification: Your One-Time Passcode (OTP)",
             html: `
@@ -27,14 +27,14 @@ async function signupEmailOtp(userName, userMail, otp) {
             <p>
                 Your 4 digits OTP for your account verification is
             </p>
-            <p style="font-size: 35px; text-align:centre; margin:8px 0; font-weight:500; padding-left:.5rem;">
+            <p style="font-size: 35px; text-align:centre; margin:8px 0; font-weight:500; padding-left:.1rem;">
                   ${otp}
             </p>
             <p>
                 Please safeguard this OTP and avoid sharing it with anyone. It's crucial for completing the verification process securely.
             </p>
             <p>
-                If you didn't initiate this verification request or have any concerns, please contact our support team immediately at <a href="mailto:labioocare@gmail.com">labioocare@gmail.com</a>.
+                If you didn't initiate this verification request or have any concerns, please contact our support team immediately at <a href="mailto:labiocare@gmail.com">labiocare@gmail.com</a>.
             </p>
             <p>
                 Thank you for your attention to this matter.
@@ -46,7 +46,6 @@ async function signupEmailOtp(userName, userMail, otp) {
             </p>`
         });
 
-        console.log(`${otp} otp send to ${userMail}`);
 
 
     } catch (error) {
@@ -59,7 +58,7 @@ async function forgetPassEmail(userName, userMail, otp) {
 
     try {
         await transporter.sendMail({
-            from: 'ctlabeebthaliyil@gmail.com',
+            from: sendingEmail,
             to: userMail,
             subject: "Password Reset Confirmation: Your One-Time Passcode (OTP)",
             html: `
@@ -69,14 +68,14 @@ async function forgetPassEmail(userName, userMail, otp) {
             <p>
                 Your 4 digits OTP for your account password reset is
             </p>
-            <p style="font-size: 35px; text-align:centre; margin:8px 0; font-weight:500; padding-left:.5rem;">
+            <p style="font-size: 35px; text-align:centre; margin:8px 0; font-weight:500; padding-left:.1rem;">
                   ${otp}
             </p>
             <p>
                 Please safeguard this OTP and avoid sharing it with anyone. It's crucial for completing the password resetting process securely.
             </p>
             <p>
-                If you didn't initiate this password reset request or have any concerns, please contact our support team immediately at <a href="mailto:labioocare@gmail.com">labioocare@gmail.com</a>.
+                If you didn't initiate this password reset request or have any concerns, please contact our support team immediately at <a href="mailto:labiocare@gmail.com">labiocare@gmail.com</a>.
             </p>
             <p>
                 Thank you for your attention to this matter.
@@ -87,8 +86,6 @@ async function forgetPassEmail(userName, userMail, otp) {
                 LABIO Support Team
             </p>`
         });
-
-        console.log(`${otp} otp send to ${userMail}`);
 
 
     } catch (error) {
