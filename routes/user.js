@@ -17,6 +17,9 @@ router.post('/forget-otp-verification/:email',userAuth.postForgetPasswordOtp)
 router.post('/reset-password',userAuth.postResetPassword)
 
 //USER HOME
+router.get('/home',userController.getHome)
+router.get('/foods',userController.getFoods)       
+router.get('/view-food/:foodId',userController.getViewFood)
 
 module.exports = router;
-          
+                 
