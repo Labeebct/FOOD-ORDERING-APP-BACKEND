@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt')
 const otpGenerator = require('../utils/otpGenarator')
+const jwt = require('jsonwebtoken');
 
 const signupModel = require('../models/signup')
 const {signupEmailOtp , forgetPassEmail} = require('../utils/emailVerify')
@@ -143,11 +144,18 @@ exports.postLogin = async(req,res) => {
 
                 //Sending succuess msg if passord matches
                 if(passwordMatch){
-                  return res.status(200).json({msg:'Login Success'})
+
+                   const payload = {
+                    userId:userExist._id,
+                    userName:userExist.userName
+                  }
+                  const token = jwt.sign(payload,process.env.JWT_SECRET);
+                  res.status(200).json({msg:'Login Success',token})
+                  //return res.status(200).json({msg:'Login Success'})
                 } else {
                   return res.status(401).json({msg:'Incorrect Password'})
                 }
-
+ 
             } else {
                 //If user not verified user will be redirected to otp verification
                 signupOTP = otpGenerator()

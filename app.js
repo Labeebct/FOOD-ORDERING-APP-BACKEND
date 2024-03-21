@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const dotenv = require('dotenv').config()
 const cors = require('cors')
 const app = express();
+const userAuth = require('./controller/userAuth')
 
 const port = process.env.PORT
 const user = require('./routes/user');
@@ -13,6 +14,7 @@ app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static('public'));
+
 
 //Linking router
 app.use('/admin',admin)  

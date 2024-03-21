@@ -1,4 +1,5 @@
 const signupModel = require('../models/signup')
+const foodModel = require('../models/food')
 const {blockUser,unblockUser} = require('../utils/userBlockUnblock')
 
 exports.postAdmin = async(req,res) => {
@@ -40,5 +41,77 @@ exports.patchBlockUser = async(req,res) => {
         
     } catch (error) {
         console.log('Error in patch block user',error);
+    }
+}
+
+exports.getAllfoods = async(req,res) => {
+    try {
+
+        //Finding unblocked foods to the variable
+        const foods = await foodModel.find()
+
+        //Passing the unblocked foods to the server
+        res.status(200).json({foods})
+    } catch (error) {
+        console.log('Error in admin show all food section',error);
+    }
+}
+
+exports.postAddFood = async(req,res) => {
+    try {
+
+        //Checking whether image exist or not
+        if(!req.file){
+            return res.status(422).json({msg:'Please provide Food Image'})
+        }
+        
+        //Destructuring datas
+        const { foodname, foodprice, foodcharge, fooddelivery , foodImg } = req.body;
+       
+        //Making sure that all fields are filled
+        if ((!foodname || !foodprice || !foodcharge || !fooddelivery)) {
+            return res.status(422).json({msg:'Please Fill all fields'})
+        } else {         
+            
+        //Making full path by removing public which is served with the server
+        const imagePath = req.file.destination.replace('./public','') + '/' + req.file.filename
+        
+        const newSchema = new foodModel({
+            foodname,
+            foodprice,
+            foodcharge,
+            fooddelivery,
+            foodImg:imagePath
+        })
+        
+        //Saving the schema and passing the success message
+        await newSchema.save()
+        res.status(200).json({msg:'Food added Success'})
+        }
+    } catch (error) {
+        console.log('Error in admin show all food section',error); 
+    }
+}
+
+exports.patchBlockproducts = async(req,res) => {
+    try {
+
+        //Taking foodid from query
+        const foodId = req.query.foodId
+
+        //Finding the food the find the current status
+        const findFood = await foodModel.findById(foodId)
+
+        //finding the current status and setting the new status
+        const newStatus = findFood.blocked ? false : true
+        const updateStatus = await foodModel.findOneAndUpdate({_id:foodId},{$set:{blocked:newStatus}},{new:true})
+
+        //Passing succes msg if blocked success
+        if(updateStatus.blocked == newStatus) return res.status(200).json({msg:'Food has been blocked',newStatus})
+        else return res.status(404).json({msg:'food blocking failed failed'})
+        
+    } catch (error) {
+        console.log('Error in patch block products',error);
+        res.status(500).send('Internal server error')
     }
 }
