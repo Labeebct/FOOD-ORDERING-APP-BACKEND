@@ -114,4 +114,4 @@ exports.patchBlockproducts = async(req,res) => {
         console.log('Error in patch block products',error);
         res.status(500).send('Internal server error')
     }
-}
+} 
