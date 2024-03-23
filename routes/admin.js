@@ -17,6 +17,8 @@ router.patch('/block-user',adminController.patchBlockUser)
 //ADMIN FOOD MANAGEMENT
 router.get('/all-foods',adminController.getAllfoods)
 router.post('/add-food',upload.single('foodImg'),adminController.postAddFood)
+router.get('/edit-food/:foodId',adminController.getEditFood)
+router.post('/edit-food/:foodId',upload.single('foodImg'),adminController.postEditFood)
 router.patch('/block-food',adminController.patchBlockproducts)
 
 module.exports = router  

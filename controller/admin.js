@@ -93,6 +93,57 @@ exports.postAddFood = async(req,res) => {
     }
 }
 
+exports.getEditFood = async(req,res) => {
+    try {
+
+        const foodId = req.params.foodId
+
+        //Finding the food uding provided id
+        const food = await foodModel.findById(foodId)
+        
+        if(food) return res.status(200).json({food})
+        else return res.status(404).json({msg:'Food not found with provided id'})
+        
+    } catch (error) {
+        console.log('Error in edit food post',error);
+    }
+}
+
+exports.postEditFood = async(req,res) => {
+    try {
+
+        const foodId = req.params.foodId
+
+        const findFood = await foodModel.findById(foodId)
+
+        //Destructuring datas
+        const { foodname, foodprice, foodcharge, fooddelivery} = req.body;
+       
+        //Making sure that all fields are filled
+        if ((!foodname || !foodprice || !foodcharge || !fooddelivery)) {
+            return res.status(422).json({msg:'Please Fill all fields'})
+        } else {         
+            
+        //Making full path by removing public which is served with the server
+        const imagePath = req.file ? req.file.destination.replace('./public','') + '/' + req.file.filename : findFood.foodImg
+    
+        //Making to obj to update
+        const foodObj ={
+            foodname,
+            foodprice,
+            foodcharge,
+            fooddelivery,    
+            foodImg:imagePath
+        }
+
+        await foodModel.findByIdAndUpdate(foodId,foodObj) 
+        res.status(200).json({msg:'Food Edited Success'})
+        }
+    } catch (error) {
+        console.log('Error in admin show all food section',error); 
+    }
+}
+
 exports.patchBlockproducts = async(req,res) => {
     try {
 
