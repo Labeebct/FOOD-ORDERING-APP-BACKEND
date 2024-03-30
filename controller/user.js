@@ -115,3 +115,23 @@ exports.postCheckout = async(req,res) => {
         console.log('Error in get checkout',error);
     }
 }   
+
+exports.getOrders = async(req,res) => {
+    try {
+
+        //Taking userid from req
+        const {userId} = req
+
+        //Finding orders of the users
+        const orders = await orderModel.find({userId}).populate('foodId')
+        
+        //Sending 404 if no orders found
+        if(!orders) return res.status(404).json({msg:'No orders Found'})
+
+        res.status(200).json({orders})
+        
+    } catch (error) {
+        console.log('Error in getcheckout',error);
+        res.status(500).json({msg:'Internal server error'})
+    }
+}        

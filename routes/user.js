@@ -24,6 +24,7 @@ router.get('/foods',verifyToken,userController.getFoods)
 router.get('/view-food/:foodId',verifyToken,userController.getViewFood)
 router.get('/checkout',verifyToken,userController.getCheckout)
 router.post('/checkout',verifyToken,userController.postCheckout)
+router.get('/orders',verifyToken,userController.getOrders)
 
 
 module.exports = router;

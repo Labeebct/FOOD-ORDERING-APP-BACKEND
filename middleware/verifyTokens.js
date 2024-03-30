@@ -14,6 +14,7 @@ const verifyToken = async(req,res,next) => {
 
         const user = await signupModel.findById(verified.userId)
         req.user = user
+        req.userId = user._id
         next()
 
         } catch (error) {
