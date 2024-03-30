@@ -2,6 +2,8 @@ const express = require('express')
 const router = express.Router()
 const adminAuth = require('../controller/adminAuth')
 const adminController = require('../controller/admin')
+const verifyToken = require('../middleware/verifyTokens')
+
 
 //Multer configuration
 const upload = require('../middleware/multer')
@@ -15,10 +17,13 @@ router.get('/users',adminController.postAdmin)
 router.patch('/block-user',adminController.patchBlockUser)
 
 //ADMIN FOOD MANAGEMENT
-router.get('/all-foods',adminController.getAllfoods)
-router.post('/add-food',upload.single('foodImg'),adminController.postAddFood)
-router.get('/edit-food/:foodId',adminController.getEditFood)
-router.post('/edit-food/:foodId',upload.single('foodImg'),adminController.postEditFood)
-router.patch('/block-food',adminController.patchBlockproducts)
+router.get('/all-foods',verifyToken,adminController.getAllfoods)
+router.post('/add-food',verifyToken,upload.single('foodImg'),adminController.postAddFood)
+router.get('/edit-food/:foodId',verifyToken,adminController.getEditFood)
+router.post('/edit-food/:foodId',verifyToken,upload.single('foodImg'),adminController.postEditFood)
+router.patch('/block-food',verifyToken,adminController.patchBlockproducts)
+router.get('/orders',verifyToken,adminController.getOrders)
+router.patch('/change-order-status',verifyToken,adminController.patchChangestatus)
+
 
 module.exports = router  

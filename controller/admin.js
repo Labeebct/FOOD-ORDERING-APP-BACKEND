@@ -1,5 +1,6 @@
 const signupModel = require('../models/signup')
 const foodModel = require('../models/food')
+const orderModel = require('../models/order')
 const {blockUser,unblockUser} = require('../utils/userBlockUnblock')
 
 exports.postAdmin = async(req,res) => {
@@ -141,7 +142,7 @@ exports.postEditFood = async(req,res) => {
         }
     } catch (error) {
         console.log('Error in admin show all food section',error); 
-    }
+    }   
 }
 
 exports.patchBlockproducts = async(req,res) => {
@@ -166,3 +167,49 @@ exports.patchBlockproducts = async(req,res) => {
         res.status(500).send('Internal server error')
     }
 }
+
+exports.getOrders = async(req,res) => {
+    try {
+
+        //Taking userid from req
+        const {userId} = req
+
+        //Finding orders of the users
+        const orders = await orderModel.find().populate('foodId').populate('userId')
+        
+        //Sending 404 if no orders found
+        if(!orders) return res.status(404).json({msg:'No orders Found'})
+
+        res.status(200).json({orders})
+        
+    } catch (error) {
+        console.log('Error in getcheckout',error);
+        res.status(500).json({msg:'Internal server error'})
+    }
+}        
+
+exports.patchChangestatus = async(req,res) => {
+    try {
+
+        //Taking userid from req
+        const {orderId} = req.query
+        const {status} = req.body
+
+        //Finding orders by id
+        const orders = await orderModel.findById(orderId)
+        
+        //Sending 404 if no orders found
+        if(!orders) return res.status(404).json({msg:'No orders Found'})
+
+        const changeStatus = await orderModel.findOneAndUpdate({_id:orderId},{$set:{status}},{new:true})
+
+        console.log(changeStatus)
+        
+        //Sending status is status updated
+        if(changeStatus.status == status) res.status(200).json({msg:'Order status updated'})
+        
+    } catch (error) {
+        console.log('Error in getcheckout',error);
+        res.status(500).json({msg:'Internal server error'})
+    }
+}        
