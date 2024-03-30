@@ -144,10 +144,10 @@ exports.postLogin = async(req,res) => {
 
                 //Sending succuess msg if passord matches
                 if(passwordMatch){
-
                    const payload = {
                     userId:userExist._id,
-                    userName:userExist.userName
+                    userName:userExist.userName,
+                    role:'user'
                   }
                   const token = jwt.sign(payload,process.env.JWT_SECRET);
                   res.status(200).json({msg:'Login Success',token})
@@ -289,3 +289,14 @@ exports.postResetPassword = async(req,res) => {
         console.log('Error in post reset password',error);
     }
 } 
+
+exports.getCheckauthentication = async(req,res) => {
+   try {
+
+    res.status(200).json({msg:'Authentication Success'})
+    
+   } catch (error) {
+     console.log('Error in getCheckauthentication',error);
+   }
+} 
+

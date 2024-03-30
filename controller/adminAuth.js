@@ -95,7 +95,15 @@ exports.postLogin = async(req,res) => {
 
             //Sending succuess msg if password matches
             if(passwordMatch){
-            return res.status(200).json({msg:'Login Success'})
+
+            const payload = {
+                userId:userExist._id,
+                userName:userExist.userName,
+                role:'admin'
+            }
+            const token = jwt.sign(payload,process.env.JWT_SECRET);
+
+            return res.status(200).json({msg:'Login Success',token})
             } else {
             return res.status(401).json({msg:'Incorrect Password'})
             }

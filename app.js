@@ -15,7 +15,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static('public'));
 
-
 //Linking router
 app.use('/admin',admin)  
 app.use('/', user);

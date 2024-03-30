@@ -16,10 +16,15 @@ router.post('/forget-password',userAuth.postForgetpassword)
 router.post('/forget-otp-verification/:email',userAuth.postForgetPasswordOtp)
 router.post('/reset-password',userAuth.postResetPassword)
 
+router.get('/check-authentication',verifyToken,userAuth.getCheckauthentication)
+
 //USER HOME
-router.get('/home',userController.getHome)
-router.get('/foods',userController.getFoods)       
-router.get('/view-food/:foodId',userController.getViewFood)
+router.get('/home',verifyToken,userController.getHome)
+router.get('/foods',verifyToken,userController.getFoods)       
+router.get('/view-food/:foodId',verifyToken,userController.getViewFood)
+router.get('/checkout',verifyToken,userController.getCheckout)
+router.post('/checkout',verifyToken,userController.postCheckout)
+
 
 module.exports = router;
                  

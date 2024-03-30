@@ -21,6 +21,9 @@ const signupSchema = new mongoose.Schema({
         type:String,
         default:'active'
     },
+    address:{
+        Type:Array,
+    },
     regDate:{
         type:Date,
         default:Date.now()
