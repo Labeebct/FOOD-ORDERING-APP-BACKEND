@@ -2,15 +2,17 @@ const signupModel = require('../models/signup')
 const foodModel = require('../models/food')
 const orderModel = require('../models/order')
 const {blockUser,unblockUser} = require('../utils/userBlockUnblock')
+const { Types } = require('mongoose')
 
 exports.postAdmin = async(req,res) => {
     try {
   
         //Finding all users and assigning to a variable to pass frontent
         const signupDatas = await signupModel.find()
+        const orders = await orderModel.find()
         
         //Passing the datas
-        res.status(200).json({signupDatas})
+        res.status(200).json({signupDatas,orders})
         
     } catch (error) {
         console.log('Error in get admin users',error);
@@ -203,13 +205,39 @@ exports.patchChangestatus = async(req,res) => {
 
         const changeStatus = await orderModel.findOneAndUpdate({_id:orderId},{$set:{status}},{new:true})
 
-        console.log(changeStatus)
-        
         //Sending status is status updated
         if(changeStatus.status == status) res.status(200).json({msg:'Order status updated'})
+        else  res.status(500).json({msg:'internal server error'})
         
     } catch (error) {
         console.log('Error in getcheckout',error);
         res.status(500).json({msg:'Internal server error'})
     }
 }        
+
+exports.getDailySale = async (req, res) => {
+    try {
+
+          // Calculate the start and end dates for the week
+        const currentDate = new Date();
+        const firstDayOfWeek = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay()));
+        const lastDayOfWeek = new Date(firstDayOfWeek);
+        lastDayOfWeek.setDate(lastDayOfWeek.getDate() + 6);
+
+        const weeklyOrders = await orderModel.find({
+            orderDate: {
+                $gte: firstDayOfWeek,
+                $lte: lastDayOfWeek
+            }
+        });
+
+        // Calculate the number of orders
+        const weeklyOrderCount = weeklyOrders.length;
+        res.status(200).json({weeklyOrderCount})
+        
+    } catch (error) {
+        console.log('Error in getDaily sale',error);
+        res.status(500).json({msg:'Internal server error',error})
+    }
+       
+}

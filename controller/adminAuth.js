@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt')
-const otpGenerator = require('../utils/otpGenarator')
+const jwt = require('jsonwebtoken');
 
 const signupModel = require('../models/adminSignup')
 
@@ -89,15 +89,15 @@ exports.postLogin = async(req,res) => {
         //Checking whether user exist or not
         const userExist = await signupModel.findOne({email})        
 
-        if(userExist){
+        if(userExist){ 
             //Checking whether password matches
             const passwordMatch = await bcrypt.compare(password,userExist.password)
 
             //Sending succuess msg if password matches
-            if(passwordMatch){
+            if(passwordMatch){ 
 
             const payload = {
-                userId:userExist._id,
+                userId:userExist._id,   
                 userName:userExist.userName,
                 role:'admin'
             }
@@ -117,4 +117,4 @@ exports.postLogin = async(req,res) => {
         console.log('Error in post login',error);
         res.status(500).send('Internal server error')
     }
-}
+} 

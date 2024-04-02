@@ -21,6 +21,6 @@ app.use('/', user);
 
 //Connecting mongodb
 app.listen(port,() => console.log('Server Is listening at',port))
-mongoose.connect('mongodb://localhost:27017/Food_Order')
+mongoose.connect(process.env.MONGO_URL)
 .then(() => console.log('Database Connected'))
 .catch((err) => console.log('Databse Connected Failed',err))

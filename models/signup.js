@@ -1,5 +1,48 @@
 const mongoose = require('mongoose')
 
+const addressObj = {
+    firstname:{
+        type:String,
+        required:true
+    },
+    lastname:{
+        type:String,
+        required:true
+    },
+    email:{
+        type:String,
+        required:true
+    },
+    mobilenum:{
+        type:Number,
+        required:true
+    },
+    state:{
+        type:String,
+        required:true
+    },
+    district:{
+        type:String,
+        required:true
+    },
+    pin:{
+        type:Number,
+        required:true
+    },
+    city:{
+        type:String,
+        required:true
+    },
+    landmark:{
+        type:String,
+        required:true
+    },
+    houseno:{
+        type:Number,
+        required:true
+    }
+}
+
 const signupSchema = new mongoose.Schema({
     userName:{
         type:String,
@@ -21,9 +64,7 @@ const signupSchema = new mongoose.Schema({
         type:String,
         default:'active'
     },
-    address:{
-        Type:Array,
-    },
+    address:[addressObj],
     regDate:{
         type:Date,
         default:Date.now()

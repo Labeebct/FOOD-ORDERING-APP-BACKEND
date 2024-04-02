@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken')
 const signupModel = require('../models/signup')
+const adminSignupModel = require('../models/adminSignup')
 
 const verifyToken = async(req,res,next) => {
     try {
@@ -13,10 +14,11 @@ const verifyToken = async(req,res,next) => {
         const verified = jwt.verify(token,process.env.JWT_SECRET)
 
         const user = await signupModel.findById(verified.userId)
+        const admin = await adminSignupModel.findById(verified.userId)
         req.user = user
-        req.userId = user._id
+        req.userId = user ? user._id : admin._id
         next()
-
+    
         } catch (error) {
             console.log('Invalid token',error);
         }
@@ -26,4 +28,4 @@ const verifyToken = async(req,res,next) => {
     }
 }
 
-module.exports = verifyToken                
+module.exports = verifyToken

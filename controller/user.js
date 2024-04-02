@@ -1,11 +1,12 @@
 const foodModel = require('../models/food')
 const orderModel = require('../models/order')
+const signupModel = require('../models/signup')
 
 exports.getHome = async(req,res) => {
     try {
 
         //Finding 5 foods for showing in home
-        const foods = await foodModel.find().limit(5)
+        const foods = await foodModel.find().limit(10)
         res.status(200).json({foods})
         
     } catch (error) {
@@ -108,6 +109,7 @@ exports.postCheckout = async(req,res) => {
             address,
         }     
         await orderModel.create(foodOrder)  
+        await signupModel.updateOne({_id},{$push:{address:address}})
         res.status(200).json({msg:'Order success'})
 
         }

@@ -23,6 +23,7 @@ router.get('/edit-food/:foodId',verifyToken,adminController.getEditFood)
 router.post('/edit-food/:foodId',verifyToken,upload.single('foodImg'),adminController.postEditFood)
 router.patch('/block-food',verifyToken,adminController.patchBlockproducts)
 router.get('/orders',verifyToken,adminController.getOrders)
+router.get('/daily-sales',verifyToken,adminController.getDailySale)
 router.patch('/change-order-status',verifyToken,adminController.patchChangestatus)
 
 
