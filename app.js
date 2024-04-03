@@ -16,8 +16,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static('public'));
 
 //Linking router
-app.use('/admin',admin)  
-app.use('/', user);
+app.use('/api/admin',admin)  
+app.use('/api/', user);
 
 //Connecting mongodb
 app.listen(port,() => console.log('Server Is listening at',port))
