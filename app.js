@@ -16,11 +16,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static('public'));
 
 //Linking router
-app.use('/api/admin',admin)  
-app.use('/api/', user);
+app.use('/admin', admin)
+app.use('/', user);
 
 //Connecting mongodb
-app.listen(port,() => console.log('Server Is listening at',port))
+app.listen(port, () => console.log('Server Is listening at', port))
 mongoose.connect(process.env.MONGO_URL)
-.then(() => console.log('Database Connected'))
-.catch((err) => console.log('Databse Connected Failed',err))
+    .then(() => console.log('Database Connected'))
+    .catch((err) => console.log('Databse Connected Failed', err))
